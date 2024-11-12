@@ -1,0 +1,25 @@
+%{
+#include <stdio.h>
+#include <string.h>
+
+char words[1000] = "";
+char operator[1000] = "";
+%}
+
+%%
+[==| !=| <=| >=|<|>|=|+|-|*|/]+    { strcat(operator, yytext); strcat(operator, " "); }
+[a-zA-Z]+ { strcat(words, yytext); strcat(words, " "); }
+\n        { /* Ignore new lines */ }
+.         { /* Ignore any other character */ }
+%%
+
+int main() {
+    yylex();
+    printf("Words = %s\n", words);
+    printf("operator = %s\n", operator);
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
