@@ -1,0 +1,84 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+const char *input;
+char lookahead;
+
+// Function declarations for each non-terminal
+void E();    // Expression
+void Edash(); // Expression Prime
+void T();    // Term
+void Tdash(); // Term Prime
+void F();    // Factor
+
+// Helper functions
+void match(char token) {
+    if (lookahead == token) {
+        lookahead = *input++;
+    } else {
+        printf("Error: Expected %c\n", token);
+        exit(1);
+    }
+}
+
+void E() {
+    T();
+    Edash();
+}
+
+void Edash() {
+    if (lookahead == '+') {
+        match('+');
+        T();
+        Edash();
+    } else if (lookahead == '-') {
+        match('-');
+        T();
+        Edash();
+    }
+}
+
+void T() {
+    F();
+    Tdash();
+}
+
+void Tdash() {
+    if (lookahead == '*') {
+        match('*');
+        F();
+        Tdash();
+    } else if (lookahead == '/') {
+        match('/');
+        F();
+        Tdash();
+    }
+}
+
+void F() {
+    if (lookahead == '(') {
+        match('(');
+        E();
+        match(')');
+    } else if (isdigit(lookahead)) {
+        match(lookahead);
+    } else {
+        printf("Error: Unexpected character %c\n", lookahead);
+        exit(1);
+    }
+}
+
+int main() {
+    input = "(1+2)*(3+4)$"; // Input string ending with a '$' symbol as end-of-input
+    lookahead = *input++;
+
+    E();  // Start parsing from the start symbol
+    if (lookahead == '$') {
+        printf("Parsing successful!\n");
+    } else {
+        printf("Error: Unexpected input after parsing\n");
+    }
+
+    return 0;
+}
